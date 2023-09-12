@@ -14,7 +14,7 @@ struct pos
 };
 
 char gamemap[101][101];
-bool vis[101][101];
+bool vis[101][101][51];
 
 int main()
 {
@@ -48,6 +48,39 @@ int main()
             }
             getchar();
         }
+
+        //bfs code
         q.push(start);
+        vis[start.pos_x][start.pos_y][start.time%k]=true;
+        while(!q.empty())
+        {
+            now=q.front();
+            q.pop();
+
+            //set break condition
+            if(now.pos_x==end.pos_x&&now.pos_y==end.pos_y)
+            {
+                count=now.time;
+                break;
+            }
+
+            //add next step to queue
+            for (int i = 0; i < 4; i++)
+            {
+                next.pos_x=now.pos_x+dir[0][i];
+                next.pos_y=now.pos_y+dir[1][i];
+                next.time=now.time+1;
+                //judge the position is vaild or not
+                if(next.pos_x<0 || next.pos_y<0||next.pos_x>n-1||next.pos_y>m-1
+                ||gamemap[next.pos_x][next.pos_y]=='#'||vis[next.pos_x][next.pos_y][next.time%k]
+                ||(gamemap[next.pos_x][next.pos_y]=='*'&&next.time%k))
+                {
+                    continue;
+                }
+                q.push(next);
+                vis[next.pos_x][next.pos_y][next.time%k]=true;
+            }
+        }
+        printf("%d\n",count);
     }
 }
