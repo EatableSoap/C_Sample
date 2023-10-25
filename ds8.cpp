@@ -6,31 +6,31 @@ int count_id = 1;
 
 struct NODE
 {
-	int orderid;     // 订单号
-	int code;        // 股票编码s
-	double price;    // 价格
-	int quantity;    // 数量
+	int orderid;	 // 订单号
+	int code;		 // 股票编码s
+	double price;	 // 价格
+	int quantity;	 // 数量
 	bool quest_type; // true表示买，false表示卖
-	NODE* next;
+	NODE *next;
 };
 
 // 所有买卖的头节点
-NODE* SELL = (NODE*)malloc(sizeof(NODE));
-NODE* BUY = (NODE*)malloc(sizeof(NODE));
+NODE *SELL = (NODE *)malloc(sizeof(NODE));
+NODE *BUY = (NODE *)malloc(sizeof(NODE));
 
 // 删除节点
-void deleteNODE(NODE* phead) // 传入删除节点的上一个节点地址
+void deleteNODE(NODE *phead) // 传入删除节点的上一个节点地址
 {
-	NODE* temp = phead->next;
+	NODE *temp = phead->next;
 	phead->next = temp->next;
 	free(temp);
 	return;
 }
 
 // 插入委托
-void insertrequest(NODE* insertNODE, NODE* insertedNODE, double Sharesprice, bool Sharetype)
+void insertrequest(NODE *insertNODE, NODE *insertedNODE, double Sharesprice, bool Sharetype)
 {
-	NODE* p1 = insertNODE;
+	NODE *p1 = insertNODE;
 	if (Sharetype)
 	{
 		while (p1->next != NULL && p1->next->price >= Sharesprice) // 买方价格降序，时间升序
@@ -49,8 +49,8 @@ void insertrequest(NODE* insertNODE, NODE* insertedNODE, double Sharesprice, boo
 // 查询委托
 void queryrequest(int n)
 {
-	NODE* p1 = BUY->next;
-	NODE* p2 = SELL->next;
+	NODE *p1 = BUY->next;
+	NODE *p2 = SELL->next;
 	cout << "buy orders:" << endl;
 	while (p1 != NULL)
 	{
@@ -70,7 +70,7 @@ void queryrequest(int n)
 // 删除委托
 void deleterequest(int n) // n表示委托序号
 {
-	NODE* phead = BUY;
+	NODE *phead = BUY;
 	int flag = 0;
 	while (phead->next != NULL)
 	{
@@ -96,7 +96,7 @@ void deleterequest(int n) // n表示委托序号
 	}
 	if (flag)
 	{
-		NODE* temp = phead->next;
+		NODE *temp = phead->next;
 		printf("deleted order:orderid: %04d, stockid:%04d, price: %6.1f, quantity: %4d, b/s: %c\n", temp->orderid, temp->code, temp->price, temp->quantity, (flag - 1) ? 98 : 115);
 		deleteNODE(phead);
 		return;
@@ -104,10 +104,10 @@ void deleterequest(int n) // n表示委托序号
 	cout << "not found" << endl;
 }
 // 找买家
-NODE* mathchbuyer(NODE* cur)
+NODE *mathchbuyer(NODE *cur)
 {
 	int findstockid = cur->code;
-	NODE* phead = BUY, * preturn = NULL;
+	NODE *phead = BUY, *preturn = NULL;
 	while (phead != NULL)
 	{
 		if (phead->code == findstockid && phead->price >= cur->price)
@@ -118,10 +118,10 @@ NODE* mathchbuyer(NODE* cur)
 	return NULL;
 }
 // 找卖家
-NODE* mathchseller(NODE* cur)
+NODE *mathchseller(NODE *cur)
 {
 	int findstockid = cur->code;
-	NODE* phead = SELL, * preturn = NULL;
+	NODE *phead = SELL, *preturn = NULL;
 	while (phead != NULL)
 	{
 		if (phead->code == findstockid && phead->price <= cur->price)
@@ -132,10 +132,10 @@ NODE* mathchseller(NODE* cur)
 	return NULL;
 }
 
-//申请委托(新建一个委托)
+// 申请委托(新建一个委托)
 void applyrequest(int Sharescode, double Sharesprice, int Sharesnum, bool Sharestype)
 {
-	NODE* Shares = (NODE*)malloc(sizeof(NODE) * 2), * temp;
+	NODE *Shares = (NODE *)malloc(sizeof(NODE) * 2), *temp;
 	Shares->orderid = count_id++;
 	Shares->code = Sharescode;
 	Shares->price = Sharesprice;
@@ -160,6 +160,8 @@ void applyrequest(int Sharescode, double Sharesprice, int Sharesnum, bool Shares
 				Shares->quantity = Shares->quantity - temp->next->quantity;
 				temp->next->quantity = 0;
 				deleteNODE(temp);
+				if (Shares->quantity == 0)
+					break;
 			}
 			temp = mathchseller(Shares);
 		}
@@ -184,6 +186,8 @@ void applyrequest(int Sharescode, double Sharesprice, int Sharesnum, bool Shares
 				Shares->quantity -= temp->next->quantity;
 				temp->next->quantity = 0;
 				deleteNODE(temp);
+				if (Shares->quantity == 0)
+					break;
 			}
 			temp = mathchbuyer(Shares);
 		}
@@ -233,7 +237,10 @@ int main()
 			deleterequest(temp);
 			break;
 		}
+		default:
+			break;
 		}
 	}
-	free(BUY); free(SELL);
+	free(BUY);
+	free(SELL);
 }
